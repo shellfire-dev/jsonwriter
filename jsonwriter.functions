@@ -28,7 +28,7 @@ jsonwriter_object()
 			;;
 			
 			boolean|number|string|objectCallback|listCallback|array)
-				jsonwriter_${fieldKind} "$1"
+				jsonwriter_${fieldType} "$1"
 				shift 1
 			;;
 			
