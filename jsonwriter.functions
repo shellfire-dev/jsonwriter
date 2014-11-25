@@ -25,9 +25,10 @@ jsonwriter_object()
 			
 			null)
 				printf 'null'
+				shift 1
 			;;
 			
-			boolean|number|string|objectCallback|listCallback|array)
+			boolean|number|string|objectCallback|listCallback)
 				jsonwriter_${fieldType} "$1"
 				shift 1
 			;;
@@ -65,9 +66,10 @@ jsonwriter_list()
 			
 			null)
 				printf 'null'
+				shift 1
 			;;
 			
-			boolean|number|string|objectCallback|listCallback|array)
+			boolean|number|string|objectCallback|listCallback)
 				jsonwriter_${fieldKind} "$1"
 				shift 1
 			;;
@@ -129,6 +131,7 @@ jsonwriter_listCallback()
 	printf ']'
 }
 
+# Not currently supported
 jsonwriter_array()
 {
 	local arrayType="$1"
@@ -182,13 +185,27 @@ jsonwriter_array()
 	printf ']'
 }
 
-jsonwriter_integer()
+jsonwriter_number()
 {
 	printf '%s' "$1"
 }
 
 jsonwriter_boolean()
 {
+	if [ $# -eq 0 ]; then
+		printf 'null'
+		return 0
+	fi
+	
+	case "$1" in)
+		
+		''|null|Null|NULL|2)
+			printf 'null'
+			return 0
+		;;
+		
+	esac
+	
 	if core_variable_isTrue "$1"; then
 		printf 'true'
 	else
@@ -201,9 +218,10 @@ jsonwriter_null()
 	printf 'null'
 }
 
+# There are actually flaws in the escaping of UTF-8 encoding in this routine
 core_dependency_requires '*' awk
 jsonwriter_string()
-{
+{	
 	printf '"'
 	awk -v ORS='' -v FS='' -v OFS='' '
 BEGIN {
