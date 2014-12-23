@@ -197,7 +197,7 @@ jsonwriter_boolean()
 		return 0
 	fi
 	
-	case "$1" in)
+	case "$1" in
 		
 		''|null|Null|NULL|2)
 			printf 'null'
