@@ -222,13 +222,18 @@ jsonwriter_null()
 	printf 'null'
 }
 
-# There are actually flaws in the escaping of UTF-8 encoding in this routine
+# There might be flaws in the escaping of UTF-8 encoding in this routine
 core_dependency_requires '*' awk
 jsonwriter_string()
 {	
 	printf '"'
-	printf '%s' "$1" | awk -v ORS='' -v FS='' -v OFS='' '
+	printf '%s' "$1" | awk '
 BEGIN {
+	srand()
+	FS=""
+	RS="n/o/m/a/t/c/h" rand()
+	ORS=""
+	
 	for (n = 0; n < 256; n++)
 	{
 		ord[sprintf("%c", n)] = n
@@ -236,61 +241,54 @@ BEGIN {
 }
 
 {
-	if (NF == 0)
+	for (i = 1; i <= NF; i++)
 	{
-		printf "\\n"
-	}
-	else
-	{
-		for (i = 1; i <= NF; i++)
+		x=ord[$i]
+		if (x < 32)
 		{
-			x=ord[$i]
-			if (x < 32)
+			if (x == 8)
 			{
-				if (x == 8)
-				{
-					print "\\b"
-				}
-				else if (x == 10)
-				{
-					print "\\n"
-				}
-				else if (x == 12)
-				{
-					print "\\f"
-				}
-				else if (x == 13)
-				{
-					print "\\r"
-				}
-				else if (x == 9)
-				{
-					print "\\t"
-				}
-				else
-				{
-					print "\\u"
-					printf("%04x", x)
-				}
+				print "\\b"
+			}
+			else if (x == 10)
+			{
+				print "\\n"
+			}
+			else if (x == 12)
+			{
+				print "\\f"
+			}
+			else if (x == 13)
+			{
+				print "\\r"
+			}
+			else if (x == 9)
+			{
+				print "\\t"
 			}
 			else
 			{
-				if (x == 34)
-				{
-					print "\\" "\""
-				}
-				else if (x == 47)
-				{
-					print "\\/"
-				}
-				else if (x == 92)
-				{
-					print "\\\\"
-				}
-				else
-				{
-					print $i
-				}
+				print "\\u"
+				printf("%04x", x)
+			}
+		}
+		else
+		{
+			if (x == 34)
+			{
+				print "\\" "\""
+			}
+			else if (x == 47)
+			{
+				print "\\/"
+			}
+			else if (x == 92)
+			{
+				print "\\\\"
+			}
+			else
+			{
+				print $i
 			}
 		}
 	}
