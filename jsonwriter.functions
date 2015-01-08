@@ -227,7 +227,7 @@ core_dependency_requires '*' awk
 jsonwriter_string()
 {	
 	printf '"'
-	awk -v ORS='' -v FS='' -v OFS='' '
+	printf '%s' "$1" | awk -v ORS='' -v FS='' -v OFS='' '
 BEGIN {
 	for (n = 0; n < 256; n++)
 	{
@@ -250,6 +250,10 @@ BEGIN {
 				if (x == 8)
 				{
 					print "\\b"
+				}
+				else if (x == 10)
+				{
+					print "\\n"
 				}
 				else if (x == 12)
 				{
@@ -275,11 +279,11 @@ BEGIN {
 				{
 					print "\\" "\""
 				}
-				else if (x == 92)
+				else if (x == 47)
 				{
 					print "\\/"
 				}
-				else if (x == 47)
+				else if (x == 92)
 				{
 					print "\\\\"
 				}
@@ -290,8 +294,6 @@ BEGIN {
 			}
 		}
 	}
-}' <<-EOF
-	${1}
-EOF
+}'
 	printf '"'
 }
